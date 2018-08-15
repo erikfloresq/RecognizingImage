@@ -29,6 +29,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         return sceneView.session
     }
     
+    func videoPlayer(name: String) -> AVPlayer {
+        guard let url = Bundle.main.url(forResource: name, withExtension: "mp4", subdirectory: "ar.scnassets") else {
+            print("Could not find video file")
+            return AVPlayer()
+        }
+        return AVPlayer(url: url)
+    }
+    
     // MARK: - View Controller Life Cycle
     
     override func viewDidLoad() {
@@ -89,8 +97,21 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             // Create a plane to visualize the initial position of the detected image.
             let plane = SCNPlane(width: referenceImage.physicalSize.width,
                                  height: referenceImage.physicalSize.height)
+            
+            var videoPlayer: AVPlayer!
+            if referenceImage.name == "urbaniaLogo" {
+                videoPlayer = self.videoPlayer(name: "expourbania")
+                plane.firstMaterial?.diffuse.contents = videoPlayer
+            } else {
+                videoPlayer = self.videoPlayer(name: "residencial")
+                plane.firstMaterial?.diffuse.contents = videoPlayer
+            }
+            videoPlayer.play()
+            
+            
+            
             let planeNode = SCNNode(geometry: plane)
-            planeNode.opacity = 0.25
+            //planeNode.opacity = 0.25
             
             /*
              `SCNPlane` is vertically oriented in its local coordinate space, but
@@ -103,9 +124,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
              Image anchors are not tracked after initial detection, so create an
              animation that limits the duration for which the plane visualization appears.
              */
-            planeNode.runAction(self.imageHighlightAction)
+            //planeNode.runAction(self.imageHighlightAction)
             
             // Add the plane visualization to the scene.
+            
+            
+            
             node.addChildNode(planeNode)
         }
 
